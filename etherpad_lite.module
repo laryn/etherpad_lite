@@ -1,0 +1,274 @@
+<?php
+/**
+ * @file
+ * This is the file description for Etherpad Lite module.
+ *
+ * In this more verbose, multi-line description, you can specify what this
+ * file does exactly. Make sure to wrap your documentation in column 78 so
+ * that the file can be displayed nicely in default-sized consoles.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function etherpad_lite_menu() {
+  $items = array();
+
+  // Type '$item ⇥' to create a new menu item.
+
+  return $items;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function etherpad_lite_field_info() {
+  return array(
+    'etherpad' => array(
+      'label' => t('Etherpad'),
+      'description' => t('This field stores varchar text in the database.'),
+      'settings' => array('max_length' => 255),
+      'instance_settings' => array('text_processing' => 0),
+      'default_widget' => 'etherpad_lite_default_widget',
+      'default_formatter' => 'etherpad_lite_default_text',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function etherpad_lite_field_widget_info() {
+  return array(
+    'etherpad_writer' => array(
+      'label' => t('Etherpad'),
+      'field types' => array('etherpad'),
+      'settings' => array('size' => 60),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+        'default value' => FIELD_BEHAVIOR_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  global $user;
+  $value = isset($items[$delta]['pid']) ? $items[$delta]['pid'] : NULL;
+  $element['#delta'] = $delta;
+
+  if ($value == NULL) {
+    $result = etherpad_lite_client()->createGroup();
+    if (!empty($result['data']['groupID'])) {
+      $gid = $result['data']['groupID'];
+      $initSession = TRUE;
+    }
+    $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
+    if (!empty($result['data']['padID'])) {
+      $value = $pid = $result['data']['padID'];
+    }
+  }
+
+  $access = array(
+    'field' => $field,
+    'entity_type' => NULL,
+  );
+
+  switch ($instance['widget']['type']) {
+    case 'etherpad_writer':
+      $element = _etherpad_frame($value, array(), $access);
+      // $element['pu'] = $value;
+      $element['pid'] = array(
+        '#type' => 'value',
+        '#value' => $value,
+      );
+      $element['#default_value'] = $value;
+      $element['#value'] = $value;
+      // $element[0] = _etherpad_frame($value);
+      // $element['pid'] = array(
+      //   '#value' => $value,
+      // );
+      // $element['etherpad'] = _etherpad_frame($value);
+      // $element['value'] = _etherpad_frame($value);
+
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function etherpad_lite_field_is_empty($item, $field) {
+  return empty($item['pid']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function etherpad_lite_field_formatter_info() {
+  return array(
+    'etherpad_iframe' => array(
+      'label' => t('Etherpad: iFrame'),
+      'field types' => array('etherpad'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+
+  switch ($display['type']) {
+    case 'etherpad_iframe':
+      foreach($items as $key => $value) {
+        $access = array(
+          'field' => $field,
+          'entity_type' => $entity_type,
+          'entity' => $entity,
+        );
+        $element[$key] = _etherpad_frame($value['pid'], array(), $access);
+      }
+      break;
+  }
+
+  return $element;
+}
+
+function _etherpad_frame($pid, $options = array(), $access = array()) {
+  global $user;
+  $options += array(
+    'url' => variable_get('etherpad_url', 'http://pad.etherpad.dev:9001'),
+  );
+
+  $group = explode('$', $pid);
+  // The pad is a group pad. Grant access to user.
+  if (substr($group[0], 0, 1) == 'g') {
+    $gid = $group[0];
+    $access += array(
+      'op' => 'edit',
+      'entity' => NULL,
+      'account' => NULL,
+    );
+    if (entity_access('update', $access['entity_type'], $access['entity'], $access['account']) && field_access($access['op'], $access['field'], $access['entity_type'], $access['entity'], $access['account'])) {
+      // Update user.
+      $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($user->name), $user->uid);
+      if (!empty($result['data']['authorID'])) {
+        $aid = $result['data']['authorID'];
+      }
+
+      // Grant current user.
+      if (isset($gid) && isset($aid)) {
+        $access = etherpad_lite_client()->createSession(time() +  60 * 60, $aid, $gid);
+        if (!empty($access['data']['sessionID'])) {
+          setcookie('sessionID', $access['data']['sessionID'], time() + 60 * 60, '/', ".etherpad.dev");
+        }
+      }
+    }
+  }
+
+  $element = array(
+    '#theme' => 'etherpad',
+    '#value' => $pid,
+    '#attributes' => array(
+      'src' => url($options['url'] . '/p/' . $pid, array('external' => TRUE)),
+      'class' => array(
+        'etherpad',
+      ),
+    ),
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_delete().
+ *
+ * Delete orphan pads.
+ */
+function etherpad_lite_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  foreach ($items as $delta => $item) {
+    $result = etherpad_lite_client()->deletePad($item['pid']);
+  }
+}
+
+/**
+ * Implements hook_element_info().
+ */
+function etherpad_lite_element_info() {
+  $types['etherpad'] = array(
+    '#theme' => 'etherpad_iframe',
+    '#input' => TRUE,
+  );
+  return $types;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function etherpad_lite_theme($existing, $type, $theme, $path) {
+  return array(
+    'etherpad' => array(
+      'render element' => 'element',
+    ),
+    'etherpad_iframe' => array(
+      'render element' => 'element',
+    )
+  );
+}
+
+function theme_etherpad(&$variables) {
+  $element = $variables['element'];
+
+  $element[0] = $element;
+  $element[0]['#theme'] = 'etherpad_iframe';
+
+  // This wrapper is required to apply CSS styling.
+  $output = '';
+  $output .= '<div class="etherpad-iframe">';
+  $output .= drupal_render_children($element);
+  $output .= '</div>';
+  return $output;
+}
+
+function theme_etherpad_iframe(&$variables) {
+  $element = $variables['element'];
+  $element['#theme'] = 'html_tag';
+  $element['#tag'] = 'iframe';
+  return drupal_render($element);
+}
+
+function etherpad_lite_client($reset = FALSE) {
+  static $service;
+  if (!isset($service) || $reset) {
+    $service = wsclient_service_load('etherpad_lite');
+  }
+  return $service;
+}
+
+/**
+ * Implements hook_user_logout().
+ */
+function etherpad_lite_user_logout($account) {
+  $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($account->name), $account->uid);
+  if (!empty($result['data']['authorID'])) {
+    $aid = $result['data']['authorID'];
+    $sessions = etherpad_lite_client()->listSessionsOfAuthor($aid);
+    if (!empty($sessions['data'])) {
+      foreach($sessions['data'] as $sid => $session) {
+        etherpad_lite_client()->deleteSession($sid);
+      }
+    }
+    $sessions = etherpad_lite_client()->listSessionsOfAuthor($aid);
+  }
+}
+
+

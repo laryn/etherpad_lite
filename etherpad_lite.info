@@ -1,0 +1,31 @@
+name = Etherpad Lite
+description = "The description of this module"
+
+; Core version (required)
+core = 7.x
+
+; Package name (see http://drupal.org/node/542202 for a list of names)
+; package =
+
+; PHP version requirement (optional)
+; php = 5.2
+
+; Loadable code files
+; files[] = etherpad_lite.module
+; files[] = etherpad_lite.admin.inc
+; files[] = etherpad_lite.class.inc
+
+; Module dependencies
+; dependencies[] = mymodule
+; dependencies[] = theirmodule (1.2)
+; dependencies[] = anothermodule (>=2.4)
+; dependencies[] = views (3.x)
+
+; Configuration page
+; configure = admin/config/etherpad_lite
+
+
+; For further information about configuration options, see
+; - http://drupal.org/node/542202
+
+stylesheets[all][] = etherpad_lite.css

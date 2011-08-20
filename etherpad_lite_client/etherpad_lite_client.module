@@ -1,0 +1,188 @@
+<?php
+/**
+ * @file
+ * Code for the Etherpad Lite client feature.
+ */
+
+function etherpad_lite_client_default_wsclient_service() {
+  $default_paramter = array();
+  $default_paramter['apikey'] = array(
+    'type' => 'hidden',
+    'default value' => 'wFpLzlyttI9Y9CWHlnC0w22LWPhT79Ix',
+  );
+
+  $service = new WSClientServiceDescription();
+  $service->name = 'etherpad_lite';
+  $service->label = 'Etherad lite';
+  $service->url = 'http://pad.etherpad.dev:9001/api/1/';
+  $service->type = 'rest';
+
+  // Add info about the REST service, which the user has to provide via the UI.
+  /*
+  $service->datatypes = array(
+    'translation_result' => array(
+      'label' => 'Translation result',
+      'property info' => array(
+        'responseData' => array(
+          'type' => 'struct',
+          'label' => 'Response data',
+          'property info' => array(
+            'translatedText' => array(
+              'type' => 'text',
+              'label' => 'Translated text',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  */
+
+  $operation = array();
+  $operation['label'] = 'createGroup';
+  $operation['url'] = 'createGroup';
+  $operation['parameter'] = $default_paramter;
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createGroup'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'createPad';
+  $operation['url'] = 'createPad';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'text' => array(
+      'type' => 'text',
+    ),
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createPad'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'createGroupPad';
+  $operation['url'] = 'createGroupPad';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'text' => array(
+      'type' => 'text',
+    ),
+    'padName' => array(
+      'type' => 'text',
+    ),
+    'groupID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createGroupPad'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'createAuthor';
+  $operation['url'] = 'createAuthor';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'name' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createAuthor'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'createAuthorIfNotExistsFor';
+  $operation['url'] = 'createAuthorIfNotExistsFor';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'name' => array(
+      'type' => 'text',
+    ),
+    'authorMapper' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createAuthorIfNotExistsFor'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'listPads';
+  $operation['url'] = 'listPads';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'groupID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['listPads'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'createSession';
+  $operation['url'] = 'createSession';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'validUntil' => array(
+      'type' => 'text',
+    ),
+    'authorID' => array(
+      'type' => 'text',
+    ),
+    'groupID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['createSession'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'deleteSession';
+  $operation['url'] = 'deleteSession';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'sessionID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['deleteSession'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'listSessionsOfGroup';
+  $operation['url'] = 'listSessionsOfGroup';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'groupID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['listSessionsOfGroup'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'listSessionsOfAuthor';
+  $operation['url'] = 'listSessionsOfAuthor';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'authorID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['listSessionsOfAuthor'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'deletePad';
+  $operation['url'] = 'deletePad';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['deletePad'] = $operation;
+
+  $services[$service->name] = $service;
+  return $services;
+}
