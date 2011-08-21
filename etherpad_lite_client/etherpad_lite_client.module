@@ -8,13 +8,13 @@ function etherpad_lite_client_default_wsclient_service() {
   $default_paramter = array();
   $default_paramter['apikey'] = array(
     'type' => 'hidden',
-    'default value' => 'wFpLzlyttI9Y9CWHlnC0w22LWPhT79Ix',
+    'default value' => variable_get('etherpad_lite_apikey'),
   );
 
   $service = new WSClientServiceDescription();
   $service->name = 'etherpad_lite';
   $service->label = 'Etherad lite';
-  $service->url = 'http://pad.etherpad.dev:9001/api/1/';
+  $service->url = variable_get('etherpad_lite_url', 'http://localhost:9001') . '/api/1/';
   $service->type = 'rest';
 
   // Add info about the REST service, which the user has to provide via the UI.
