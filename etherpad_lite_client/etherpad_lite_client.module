@@ -183,6 +183,48 @@ function etherpad_lite_client_default_wsclient_service() {
   $operation['result'] = array('type' => 'text', 'label' => 'Result');
   $service->operations['deletePad'] = $operation;
 
+  $operation = array();
+  $operation['label'] = 'getText';
+  $operation['url'] = 'getText';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'rev' => array(
+      'type' => 'text',
+    ),
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['getText'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'setText';
+  $operation['url'] = 'setText';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'text' => array(
+      'type' => 'text',
+    ),
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['setText'] = $operation;
+
+  $operation = array();
+  $operation['label'] = 'getRevisionsCount';
+  $operation['url'] = 'getRevisionsCount';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['getRevisionsCount'] = $operation;
+
   $services[$service->name] = $service;
   return $services;
 }
