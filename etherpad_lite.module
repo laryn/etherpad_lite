@@ -107,20 +107,10 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
   switch ($instance['widget']['type']) {
     case 'etherpad_writer':
       $element = _etherpad_frame($value, array(), $access);
-      // $element['pu'] = $value;
       $element['pid'] = array(
         '#type' => 'value',
         '#value' => $value,
       );
-      $element['#default_value'] = $value;
-      $element['#value'] = $value;
-      // $element[0] = _etherpad_frame($value);
-      // $element['pid'] = array(
-      //   '#value' => $value,
-      // );
-      // $element['etherpad'] = _etherpad_frame($value);
-      // $element['value'] = _etherpad_frame($value);
-
       break;
   }
 
