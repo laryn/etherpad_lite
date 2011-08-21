@@ -70,8 +70,7 @@ function etherpad_lite_field_info() {
     'etherpad' => array(
       'label' => t('Etherpad'),
       'description' => t('This field stores varchar text in the database.'),
-      'settings' => array('max_length' => 255),
-      'instance_settings' => array('text_processing' => 0),
+      'instance_settings' => array('type' => 0),
       'default_widget' => 'etherpad_lite_default_widget',
       'default_formatter' => 'etherpad_lite_default_text',
     ),
@@ -93,6 +92,24 @@ function etherpad_lite_field_widget_info() {
       ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function etherpad_lite_field_settings_form($field, $instance, $has_data) {
+  $settings = $field['settings'];
+  $form['type'] = array(
+    '#type' => 'select',
+    '#title' => 'Pad type',
+    '#required' => TRUE,
+    '#options' => array(
+      '0' => t('Public, everyone can view and edit.'),
+      '1' => t('Group pad, granted users can view and edit.'),
+    ),
+    '#default_value' => $settings['type'],
+  );
+  return $form;
 }
 
 /**
