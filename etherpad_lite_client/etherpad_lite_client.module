@@ -1,9 +1,8 @@
 <?php
-/**
- * @file
- * Code for the Etherpad Lite client feature.
- */
 
+/**
+ * Implements hook_default_wsclient_service()
+ */
 function etherpad_lite_client_default_wsclient_service() {
   $default_paramter = array();
   $default_paramter['apikey'] = array(
