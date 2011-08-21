@@ -203,6 +203,18 @@ function etherpad_lite_client_default_wsclient_service() {
   $operation['result'] = array('type' => 'text', 'label' => 'Result');
   $service->operations['getRevisionsCount'] = $operation;
 
+  $operation = array();
+  $operation['label'] = 'getReadOnlyID';
+  $operation['url'] = 'getReadOnlyID';
+  $operation['parameter'] = $default_paramter;
+  $operation['parameter'] += array(
+    'padID' => array(
+      'type' => 'text',
+    ),
+  );
+  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $service->operations['getReadOnlyID'] = $operation;
+
   $services[$service->name] = $service;
   return $services;
 }
