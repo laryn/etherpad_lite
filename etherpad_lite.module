@@ -267,8 +267,5 @@ function etherpad_lite_user_logout($account) {
         etherpad_lite_client()->deleteSession($sid);
       }
     }
-    $sessions = etherpad_lite_client()->listSessionsOfAuthor($aid);
   }
 }
-
-
