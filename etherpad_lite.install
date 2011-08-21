@@ -33,3 +33,12 @@ function etherpad_lite_field_schema($field) {
     ),
   );
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function etherpad_lite_uninstall() {
+  variable_del('etherpad_lite_url');
+  variable_del('etherpad_lite_apikey');
+}
+
