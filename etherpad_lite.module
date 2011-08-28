@@ -120,33 +120,70 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
   $value = isset($items[$delta]['pid']) ? $items[$delta]['pid'] : NULL;
   $element['#delta'] = $delta;
 
-  if ($value == NULL) {
-    $result = etherpad_lite_client()->createGroup();
-    if (!empty($result['data']['groupID'])) {
-      $gid = $result['data']['groupID'];
-      $initSession = TRUE;
-    }
-    $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
-    if (!empty($result['data']['padID'])) {
-      $value = $pid = $result['data']['padID'];
-    }
-  }
-
   $access = array(
     'field' => $field,
-    'entity_type' => NULL,
+    'entity_type' => $element['#entity_type'],
   );
+  if (isset($element['#bundle'])) {
+    $access['bundle'] = $element['#bundle'];
+  }
+
+  if (isset($init) && $init == TRUE) {
+    $access += array(
+      'entity_op' => 'create',
+      'op' => 'create',
+    );
+  }
+
 
   switch ($instance['widget']['type']) {
     case 'etherpad_writer':
-      $element = _etherpad_frame($value, array(), $access);
       $element['pid'] = array(
-        '#type' => 'value',
-        '#value' => $value,
+        '#type' => 'hidden',
+        '#default_value' => $value,
       );
+      $element['access'] = array(
+        '#type' => 'value',
+        '#value' => $access,
+      );
+      $element['#after_build'][] = 'etherpad_lite_reder_iframe';
       break;
   }
 
+  return $element;
+}
+
+function etherpad_lite_reder_iframe($element) {
+  $pid = $element['pid']['#value'];
+  $access = $element['access']['#value'];
+  $field = $element['access']['#value']['field'];
+
+  if ($pid == NULL) {
+    $hidePad = TRUE;
+    // Create a group pad.
+    if ($field['settings']['type'] == 1) {
+      $result = etherpad_lite_client()->createGroup();
+      if (!empty($result['data']['groupID'])) {
+        $gid = $result['data']['groupID'];
+        $init = TRUE;
+      }
+      $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
+      if (!empty($result['data']['padID'])) {
+        $pid = $result['data']['padID'];
+      }
+    } else {
+      // Create a public pad.
+      $public_pid = uniqid('', TRUE);
+      $result = etherpad_lite_client()->createPad('', $public_pid);
+      if ($result['code'] == 0 && $result['message'] == 'ok') {
+        $pid = $public_pid;
+      }
+    }
+
+    $element['pid']['#value'] = $pid;
+  }
+
+  $element['pad'] = _etherpad_frame($pid, array(), $access);
   return $element;
 }
 
@@ -166,6 +203,10 @@ function etherpad_lite_field_formatter_info() {
       'label' => t('Etherpad: iFrame'),
       'field types' => array('etherpad'),
     ),
+    'etherpad_iframe_readonly' => array(
+      'label' => t('Etherpad: iFrame, Readonly'),
+      'field types' => array('etherpad'),
+    ),
   );
 }
 
@@ -176,15 +217,26 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
   $element = array();
   $settings = $display['settings'];
 
+  $access = array(
+    'field' => $field,
+    'entity_type' => $entity_type,
+    'entity' => $entity,
+    'op' => 'view',
+    'entity_op' => 'view',
+  );
+
   switch ($display['type']) {
     case 'etherpad_iframe':
       foreach($items as $key => $value) {
-        $access = array(
-          'field' => $field,
-          'entity_type' => $entity_type,
-          'entity' => $entity,
-        );
         $element[$key] = _etherpad_frame($value['pid'], array(), $access);
+      }
+      break;
+    case 'etherpad_iframe_readonly':
+      foreach($items as $key => $value) {
+        $result = etherpad_lite_client()->getReadOnlyID($value['pid']);
+        if (!empty($result['data']['readOnlyID'])) {
+          $element[$key] = _etherpad_frame($result['data']['readOnlyID'], array(), $access);
+        }
       }
       break;
   }
@@ -198,16 +250,20 @@ function _etherpad_frame($pid, $options = array(), $access = array()) {
     'url' => variable_get('etherpad_url', 'http://pad.etherpad.dev:9001'),
   );
 
+  $denied = FALSE;
   $group = explode('$', $pid);
   // The pad is a group pad. Grant access to user.
   if (substr($group[0], 0, 1) == 'g') {
+    $denied = TRUE;
     $gid = $group[0];
     $access += array(
+      'enity_op' => 'update',
       'op' => 'edit',
       'entity' => NULL,
       'account' => NULL,
     );
-    if (entity_access('update', $access['entity_type'], $access['entity'], $access['account']) && field_access($access['op'], $access['field'], $access['entity_type'], $access['entity'], $access['account'])) {
+
+    if (entity_access($access['enity_op'], $access['entity_type'], $access['entity'], $access['account']) && field_access($access['op'], $access['field'], $access['entity_type'], $access['entity'], $access['account'])) {
       // Update user.
       $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($user->name), $user->uid);
       if (!empty($result['data']['authorID'])) {
@@ -220,21 +276,25 @@ function _etherpad_frame($pid, $options = array(), $access = array()) {
         $access = etherpad_lite_client()->createSession($timeout, $aid, $gid);
         if (!empty($access['data']['sessionID'])) {
           setcookie('sessionID', $access['data']['sessionID'], $timeout, '/', variable_get('etherpad_lite_cookie_domain'));
+          $denied = FALSE;
         }
       }
     }
   }
 
-  $element = array(
-    '#theme' => 'etherpad',
-    '#value' => $pid,
-    '#attributes' => array(
-      'src' => url($options['url'] . '/p/' . $pid, array('external' => TRUE)),
-      'class' => array(
-        'etherpad',
+  $element = array();
+  if ($denied == FALSE) {
+    $element = array(
+      '#theme' => 'etherpad',
+      '#value' => $pid,
+      '#attributes' => array(
+        'src' => url($options['url'] . '/p/' . $pid, array('external' => TRUE)),
+        'class' => array(
+          'etherpad',
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   return $element;
 }
@@ -257,7 +317,8 @@ function etherpad_lite_field_delete($entity_type, $entity, $field, $instance, $l
 function etherpad_lite_element_info() {
   $types['etherpad'] = array(
     '#theme' => 'etherpad_iframe',
-    '#input' => TRUE,
+    '#input' => FALSE,
+    '#theme_wrappers' => array('form_element'),
   );
   return $types;
 }
