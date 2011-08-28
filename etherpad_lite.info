@@ -4,17 +4,6 @@ description = "Intergrate Etherpad lite into Drupal."
 ; Core version (required)
 core = 7.x
 
-; Package name (see http://drupal.org/node/542202 for a list of names)
-; package =
-
-; PHP version requirement (optional)
-; php = 5.2
-
-; Loadable code files
-; files[] = etherpad_lite.module
-; files[] = etherpad_lite.admin.inc
-; files[] = etherpad_lite.class.inc
-
 ; Module dependencies
 dependencies[] = etherpad_lite_client
 
