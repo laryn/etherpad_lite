@@ -26,20 +26,20 @@ function etherpad_lite_menu() {
 function etherpad_lite_admin_settings() {
   $form = array();
 
-  $form['etherpad_lite_url'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Etherpad URL',
-    '#default_value' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
-    '#required' => TRUE,
-    '#description' => 'URL to your Etherpad Lite installation. Without trailing slash. e.g. http://localhost:9001',
-  );
-
   $form['etherpad_lite_apikey'] = array(
     '#type' => 'textfield',
     '#title' => 'Etherpad API Key',
     '#default_value' => variable_get('etherpad_lite_apikey'),
     '#required' => TRUE,
     '#description' => 'Serach for APIKEY.txt in your Etherpad Lite installation.',
+  );
+
+  $form['etherpad_lite_url'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Etherpad URL',
+    '#default_value' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
+    '#required' => TRUE,
+    '#description' => 'URL to your Etherpad Lite installation. Without trailing slash. e.g. http://localhost:9001',
   );
 
   $form['etherpad_lite_cookie_domain'] = array(
