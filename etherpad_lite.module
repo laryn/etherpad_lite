@@ -68,9 +68,11 @@ function etherpad_lite_field_info() {
     'etherpad' => array(
       'label' => t('Etherpad'),
       'description' => t('This field stores varchar text in the database.'),
-      'instance_settings' => array('type' => 0),
-      'default_widget' => 'etherpad_lite_default_widget',
-      'default_formatter' => 'etherpad_lite_default_text',
+      'instance_settings' => array(
+        'type' => 0,
+      ),
+      'default_widget' => 'etherpad_writer',
+      'default_formatter' => 'etherpad_iframe',
     ),
   );
 }
@@ -105,7 +107,7 @@ function etherpad_lite_field_settings_form($field, $instance, $has_data) {
       '0' => t('Public, everyone can view and edit.'),
       '1' => t('Group pad, granted users can view and edit.'),
     ),
-    '#default_value' => $settings['type'],
+    '#default_value' => isset($settings['type']) ? $settings['type'] : 0,
   );
   return $form;
 }
