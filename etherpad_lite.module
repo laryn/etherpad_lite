@@ -245,7 +245,7 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
 function _etherpad_frame($pid, $options = array(), $access = array()) {
   global $user;
   $options += array(
-    'url' => variable_get('etherpad_url', 'http://pad.etherpad.dev:9001'),
+    'url' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
   );
 
   $denied = FALSE;
