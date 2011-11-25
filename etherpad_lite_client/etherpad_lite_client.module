@@ -1,7 +1,13 @@
 <?php
+/**
+ * @file
+ * Etherpad lite client.
+ *
+ * Wrap Etherpad Lite API in some simple callbacks.
+ */
 
 /**
- * Implements hook_default_wsclient_service()
+ * Implements hook_default_wsclient_service().
  */
 function etherpad_lite_client_default_wsclient_service() {
   $default_parameter = array();

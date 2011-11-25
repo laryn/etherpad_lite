@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Etherpad lite integration for Drupal.
+ *
+ * Install and delete field schema.
+ */
 
 /**
  * Implements hook_field_schema().

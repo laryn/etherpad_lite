@@ -173,7 +173,8 @@ function etherpad_lite_reder_iframe($element) {
       if (!empty($result['data']['padID'])) {
         $pid = $result['data']['padID'];
       }
-    } else {
+    }
+    else {
       // Create a public pad.
       $public_pid = uniqid('', TRUE);
       $result = etherpad_lite_client()->createPad('', $public_pid);
@@ -238,12 +239,12 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
 
   switch ($display['type']) {
     case 'etherpad_iframe':
-      foreach($items as $key => $value) {
+      foreach ($items as $key => $value) {
         $element[$key] = _etherpad_frame($value['pid'], array(), $access);
       }
       break;
     case 'etherpad_iframe_readonly':
-      foreach($items as $key => $value) {
+      foreach ($items as $key => $value) {
         $result = etherpad_lite_client()->getReadOnlyID($value['pid']);
         if (!empty($result['data']['readOnlyID'])) {
           $element[$key] = _etherpad_frame($result['data']['readOnlyID'], array(), $access);
@@ -264,7 +265,7 @@ function _etherpad_frame($pid, $options = array(), $access = array()) {
   $denied = FALSE;
   $group = explode('$', $pid);
   // The pad is a group pad. Grant access to user.
-  if (substr($group[0], 0, 1) == 'g') {
+  if (drupal_substr($group[0], 0, 1) == 'g') {
     $denied = TRUE;
     $gid = $group[0];
     $access += array(
@@ -386,7 +387,7 @@ function etherpad_lite_user_logout($account) {
     $aid = $result['data']['authorID'];
     $sessions = etherpad_lite_client()->listSessionsOfAuthor($aid);
     if (!empty($sessions['data'])) {
-      foreach($sessions['data'] as $sid => $session) {
+      foreach ($sessions['data'] as $sid => $session) {
         etherpad_lite_client()->deleteSession($sid);
       }
     }
