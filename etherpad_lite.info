@@ -5,6 +5,7 @@ description = "Intergrate Etherpad lite into Drupal."
 core = 7.x
 
 ; Module dependencies
+dependencies[] = text
 dependencies[] = etherpad_lite_client
 
 ; Configuration page

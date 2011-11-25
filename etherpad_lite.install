@@ -10,9 +10,11 @@ function etherpad_lite_field_schema($field) {
       'length' => 255,
       'not null' => FALSE,
     ),
-  );
-
-  $columns += array(
+    'value' => array(
+      'type' => 'text',
+      'size' => 'big',
+      'not null' => FALSE,
+    ),
     'format' => array(
       'type' => 'varchar',
       'length' => 255,

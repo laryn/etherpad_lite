@@ -71,6 +71,7 @@ function etherpad_lite_field_info() {
       'description' => t('This field stores varchar text in the database.'),
       'instance_settings' => array(
         'type' => 0,
+        'text_processing' => 1,
       ),
       'default_widget' => 'etherpad_writer',
       'default_formatter' => 'etherpad_iframe',
@@ -209,6 +210,15 @@ function etherpad_lite_field_formatter_info() {
       'field types' => array('etherpad'),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function etherpad_lite_field_formatter_info_alter(&$info) {
+  if (isset($info['text_default'])) {
+    $info['text_default']['field types'][] = 'etherpad';
+  }
 }
 
 /**
