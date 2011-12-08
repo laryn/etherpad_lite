@@ -277,7 +277,7 @@ function _etherpad_frame($pid, $options = array(), $access = array()) {
 
     if (entity_access($access['enity_op'], $access['entity_type'], $access['entity'], $access['account']) && field_access($access['op'], $access['field'], $access['entity_type'], $access['entity'], $access['account'])) {
       // Update user.
-      $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($user->name), $user->uid);
+      $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($user), $user->uid);
       if (!empty($result['data']['authorID'])) {
         $aid = $result['data']['authorID'];
       }
