@@ -414,3 +414,7 @@ function etherpad_lite_field_presave($entity_type, $entity, $field, $instance, $
     }
   }
 }
+
+function etherpad_lite_form_field_ui_field_edit_form_alter(&$form, $form_state) {
+  unset($form['instance']['default_value_widget'][$form['#instance']['field_name']]);
+}
