@@ -58,7 +58,11 @@ function etherpad_lite_admin_settings() {
     '#description' => 'Session timeout in seconds. Used in the cookie.',
   );
 
-  return system_settings_form($form);
+  $form = system_settings_form($form);
+
+  // Clear all caches to rebuild wsclient definitions.
+  $form['#submit'][] = 'drupal_flush_all_caches';
+  return $form;
 }
 
 /**
