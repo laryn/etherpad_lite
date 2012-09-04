@@ -154,14 +154,14 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
         '#type' => 'value',
         '#value' => $access,
       );
-      $element['#after_build'][] = 'etherpad_lite_reder_iframe';
+      $element['#after_build'][] = 'etherpad_lite_render_iframe';
       break;
   }
 
   return $element;
 }
 
-function etherpad_lite_reder_iframe($element) {
+function etherpad_lite_render_iframe($element) {
   $pid = $element['pid']['#value'];
   $access = $element['access']['#value'];
   $field = $element['access']['#value']['field'];
