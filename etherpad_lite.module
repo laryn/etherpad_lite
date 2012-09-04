@@ -122,7 +122,6 @@ function etherpad_lite_field_settings_form($field, $instance, $has_data) {
  * Implements hook_field_widget_form().
  */
 function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  global $user;
   $value = isset($items[$delta]['pid']) ? $items[$delta]['pid'] : NULL;
   $element['#delta'] = $delta;
 
@@ -165,13 +164,11 @@ function etherpad_lite_reder_iframe($element) {
   $field = $element['access']['#value']['field'];
 
   if ($pid == NULL) {
-    $hidePad = TRUE;
     // Create a group pad.
     if ($field['settings']['type'] == 1) {
       $result = etherpad_lite_client()->createGroup();
       if (!empty($result['data']['groupID'])) {
         $gid = $result['data']['groupID'];
-        $init = TRUE;
       }
       $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
       if (!empty($result['data']['padID'])) {
