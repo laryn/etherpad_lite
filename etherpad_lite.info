@@ -6,6 +6,7 @@ core = 7.x
 
 ; Module dependencies
 dependencies[] = text
+dependencies[] = entity
 dependencies[] = etherpad_lite_client
 
 ; Configuration page
