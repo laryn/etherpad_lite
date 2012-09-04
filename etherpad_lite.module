@@ -161,6 +161,15 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
   return $element;
 }
 
+/**
+ * Render etherpad lite iframe.
+ *
+ * @param array $element
+ *   Form API element to process.
+ *
+ * @return array
+ *   Form API element
+ */
 function etherpad_lite_render_iframe($element) {
   $pid = $element['pid']['#value'];
   $access = $element['access']['#value'];
@@ -247,6 +256,7 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
         $element[$key] = _etherpad_frame($value['pid'], array(), $access);
       }
       break;
+
     case 'etherpad_iframe_readonly':
       foreach ($items as $key => $value) {
         $result = etherpad_lite_client()->getReadOnlyID($value['pid']);
@@ -260,6 +270,20 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
   return $element;
 }
 
+/**
+ * Authenticate and render a pad.
+ *
+ * @param string $pid
+ *   Etherpad lite id.
+ * @param array $options
+ *   (optional) A set of options.
+ *   - url: Etherpad lite url.
+ * @param array $access
+ *   (optional) Options for entity_access. Only required for group pads.
+ *
+ * @return array
+ *   Renderable etherpad element.
+ */
 function _etherpad_frame($pid, $options = array(), $access = array()) {
   global $user;
   $options += array(
@@ -349,10 +373,13 @@ function etherpad_lite_theme($existing, $type, $theme, $path) {
     ),
     'etherpad_iframe' => array(
       'render element' => 'element',
-    )
+    ),
   );
 }
 
+/**
+ * Etherpad lite embed code wrapper.
+ */
 function theme_etherpad(&$variables) {
   $element = $variables['element'];
 
@@ -367,6 +394,9 @@ function theme_etherpad(&$variables) {
   return $output;
 }
 
+/**
+ * Etherpad lite embed codex.
+ */
 function theme_etherpad_iframe(&$variables) {
   $element = $variables['element'];
   $element['#theme'] = 'html_tag';
@@ -374,6 +404,15 @@ function theme_etherpad_iframe(&$variables) {
   return drupal_render($element);
 }
 
+/**
+ * Load a fully configured wsclient definition.
+ *
+ * @param bool $reset
+ *   Whether to reset the static cache.
+ *
+ * @return WSClientServiceDescription
+ *   Fully configured wsclient definition.
+ */
 function etherpad_lite_client($reset = FALSE) {
   static $service;
   if (!isset($service) || $reset) {
@@ -419,6 +458,9 @@ function etherpad_lite_field_presave($entity_type, $entity, $field, $instance, $
   }
 }
 
+/**
+ * Implements hook_form_field_ui_field_edit_form_alter().
+ */
 function etherpad_lite_form_field_ui_field_edit_form_alter(&$form, $form_state) {
   unset($form['instance']['default_value_widget'][$form['#instance']['field_name']]);
 }
