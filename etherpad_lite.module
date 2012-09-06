@@ -199,7 +199,7 @@ function etherpad_lite_render_iframe($element) {
     $element['pid']['#value'] = $pid;
   }
 
-  $element['pad'] = _etherpad_frame($pid, array(), $access);
+  $element['pad'] = etherpad_lite_prepare_iframe($pid, array(), $access);
   return $element;
 }
 
@@ -253,7 +253,7 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
   switch ($display['type']) {
     case 'etherpad_iframe':
       foreach ($items as $key => $value) {
-        $element[$key] = _etherpad_frame($value['pid'], array(), $access);
+        $element[$key] = etherpad_lite_prepare_iframe($value['pid'], array(), $access);
       }
       break;
 
@@ -261,7 +261,7 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
       foreach ($items as $key => $value) {
         $result = etherpad_lite_client()->getReadOnlyID($value['pid']);
         if (!empty($result['data']['readOnlyID'])) {
-          $element[$key] = _etherpad_frame($result['data']['readOnlyID'], array(), $access);
+          $element[$key] = etherpad_lite_prepare_iframe($result['data']['readOnlyID'], array(), $access);
         }
       }
       break;
@@ -284,7 +284,7 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
  * @return array
  *   Renderable etherpad element.
  */
-function _etherpad_frame($pid, $options = array(), $access = array()) {
+function etherpad_lite_prepare_iframe($pid, $options = array(), $access = array()) {
   global $user;
   $options += array(
     'url' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
