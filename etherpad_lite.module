@@ -143,7 +143,6 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
     );
   }
 
-
   switch ($instance['widget']['type']) {
     case 'etherpad_writer':
       $element['pid'] = array(
@@ -170,7 +169,7 @@ function etherpad_lite_field_widget_form(&$form, &$form_state, $field, $instance
  * @return array
  *   Form API element
  */
-function etherpad_lite_render_iframe($element) {
+function etherpad_lite_render_iframe(array $element) {
   $pid = $element['pid']['#value'];
   $access = $element['access']['#value'];
   $field = $element['access']['#value']['field'];
