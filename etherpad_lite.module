@@ -174,31 +174,48 @@ function etherpad_lite_render_iframe(array $element) {
   $access = $element['access']['#value'];
   $field = $element['access']['#value']['field'];
 
-  if ($pid == NULL) {
-    // Create a group pad.
-    if ($field['settings']['type'] == 1) {
-      $result = etherpad_lite_client()->createGroup();
-      if (!empty($result['data']['groupID'])) {
-        $gid = $result['data']['groupID'];
+  // If the etherpad side of things is not configured yet trying to use it will
+  // cause the site to die. The web service is already raising an exception. We
+  // need to handle that ourselves too.
+  try {
+    if ($pid == NULL) {
+      // Create a group pad.
+      if ($field['settings']['type'] == 1) {
+        $result = etherpad_lite_client()->createGroup();
+        if (!empty($result['data']['groupID'])) {
+          $gid = $result['data']['groupID'];
+        }
+        $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
+        if (!empty($result['data']['padID'])) {
+          $pid = $result['data']['padID'];
+        }
       }
-      $result = etherpad_lite_client()->createGroupPad('', uniqid('', TRUE), $gid);
-      if (!empty($result['data']['padID'])) {
-        $pid = $result['data']['padID'];
+      else {
+        // Create a public pad.
+        $public_pid = uniqid('', TRUE);
+        $result = etherpad_lite_client()->createPad('', $public_pid);
+        if ($result['code'] == 0 && $result['message'] == 'ok') {
+          $pid = $public_pid;
+        }
       }
-    }
-    else {
-      // Create a public pad.
-      $public_pid = uniqid('', TRUE);
-      $result = etherpad_lite_client()->createPad('', $public_pid);
-      if ($result['code'] == 0 && $result['message'] == 'ok') {
-        $pid = $public_pid;
-      }
+
+      $element['pid']['#value'] = $pid;
     }
 
-    $element['pid']['#value'] = $pid;
+    $element['pad'] = etherpad_lite_prepare_iframe($pid, array(), $access);
   }
-
-  $element['pad'] = etherpad_lite_prepare_iframe($pid, array(), $access);
+  catch (Exception $e) {
+    $message = t('Unable to connect to the etherpad service. Has it been <a href="/admin/config/services/etherpad-lite">configured</a>?');
+    // Set the error in the messages section.
+    form_set_error('pad', $message);
+    // Add an element so the message also appears in context with the placement
+    // in the form.
+    $element['pad'] = array(
+      '#markup' => '<div class="alert alert-block alert-danger messages error">' .
+      $message .
+      '</div>',
+    );
+  }
   return $element;
 }
 
