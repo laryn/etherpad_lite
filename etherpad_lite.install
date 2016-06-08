@@ -7,6 +7,31 @@
  */
 
 /**
+ * Impliments hook_requirements().
+ */
+function etherpad_lite_requirements($phase) {
+  if ($phase == 'runtime') {
+    $ret = array();
+    $connection = array(
+      'title' => t('Etherpad Lite connection'),
+      'value' => '',
+    );
+    try {
+      $pads = etherpad_lite_client()->listPads();
+      dpm($pads);
+      $connection['description'] = t('We appear to be able to reach the Etherpad server.');
+      $connection['severity'] = REQUIREMENT_OK;
+    }
+    catch (Exception $e) {
+      $connection['description'] = t('Unable to connect to the etherpad service. Has it been <a href="/admin/config/services/etherpad-lite">configured</a>?');
+      $connection['severity'] = REQUIREMENT_ERROR;
+    }
+    $ret['etherpad_lite_connection'] = $connection;
+    return $ret;
+  }
+}
+
+/**
  * Implements hook_field_schema().
  */
 function etherpad_lite_field_schema($field) {
