@@ -1,4 +1,5 @@
-core = "7.x"
+backdrop = 1.x
+type = module
 dependencies[] = "wsclient_rest"
 description = "Client for Etherpads REST API."
 name = "Etherpad Lite client"

@@ -2,7 +2,8 @@ name = Etherpad Lite
 description = "Intergrate Etherpad lite into Drupal."
 
 ; Core version (required)
-core = 7.x
+backdrop = 1.x
+type = module
 
 ; Module dependencies
 dependencies[] = text

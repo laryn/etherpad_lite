@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Etherpad lite integration for Drupal.
+ * Etherpad lite integration for Backdrop.
  *
  * Install and delete field schema.
  */
@@ -71,6 +71,29 @@ function etherpad_lite_field_schema($field) {
  * Implements hook_uninstall().
  */
 function etherpad_lite_uninstall() {
-  variable_del('etherpad_lite_url');
-  variable_del('etherpad_lite_apikey');
+  config_clear('etherpad_lite.settings', 'etherpad_lite_url');
+  config_clear('etherpad_lite.settings', 'etherpad_lite_apikey');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function etherpad_lite_update_1000() {
+  $config = config('etherpad_lite.settings');
+  $config->set('etherpad_lite_apikey', update_variable_get('etherpad_lite_apikey', ''));
+  $config->set('etherpad_lite_url', update_variable_get('etherpad_lite_url', 'http://localhost:9001'));
+  $config->set('etherpad_lite_cookie_domain', update_variable_get('etherpad_lite_cookie_domain', ''));
+  $config->set('etherpad_lite_session_timeout', update_variable_get('etherpad_lite_session_timeout', 'dynamic value in file /etherpad_lite/etherpad_lite.module line 331'));
+  update_variable_del('etherpad_lite_apikey');
+  update_variable_del('etherpad_lite_url');
+  update_variable_del('etherpad_lite_cookie_domain');
+  update_variable_del('etherpad_lite_session_timeout');
+}
+
+/**
+ * Implements hook_install().
+ */
+function etherpad_lite_install() {
+  // Dynamically generated variable data was detected.
+  // /etherpad_lite/etherpad_lite.module line 331
 }

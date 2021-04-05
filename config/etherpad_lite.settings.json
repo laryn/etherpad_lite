@@ -1,0 +1,7 @@
+{
+    "_config_name": "etherpad_lite.settings",
+    "etherpad_lite_apikey": "",
+    "etherpad_lite_url": "http://localhost:9001",
+    "etherpad_lite_cookie_domain": "",
+    "etherpad_lite_session_timeout": "dynamic value in file /etherpad_lite/etherpad_lite.module line 331"
+}

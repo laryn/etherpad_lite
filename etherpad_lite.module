@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Etherpad lite integration for Drupal.
+ * Etherpad lite integration for Backdrop.
  *
  * Main concept: Etherpad as a field.
  */
@@ -15,7 +15,7 @@ function etherpad_lite_menu() {
   $items['admin/config/services/etherpad-lite'] = array(
     'title' => 'Etherpad lite',
     'description' => 'Configure Etherpad lite.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('etherpad_lite_admin_settings'),
     'access arguments' => array('administer site configuration'),
   );
@@ -24,15 +24,27 @@ function etherpad_lite_menu() {
 }
 
 /**
+ * Implements hook_config_info().
+ */
+function etherpad_lite_config_info() {
+  $prefixes['etherpad_lite.settings'] = array(
+    'label' => t('Module name settings'),
+    'group' => t('Configuration'),
+  );
+}
+
+/**
  * Etherpad lite settings form.
  */
 function etherpad_lite_admin_settings() {
+  $config = config('etherpad_lite.settings');
   $form = array();
+  $form['#config'] = 'etherpad_lite.settings';
 
   $form['etherpad_lite_apikey'] = array(
     '#type' => 'textfield',
     '#title' => 'Etherpad API Key',
-    '#default_value' => variable_get('etherpad_lite_apikey'),
+    '#default_value' => $config->get('etherpad_lite_apikey'),
     '#required' => TRUE,
     '#description' => 'Search for APIKEY.txt in your Etherpad Lite installation.',
   );
@@ -40,7 +52,7 @@ function etherpad_lite_admin_settings() {
   $form['etherpad_lite_url'] = array(
     '#type' => 'textfield',
     '#title' => 'Etherpad URL',
-    '#default_value' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
+    '#default_value' => $config->get('etherpad_lite_url'),
     '#required' => TRUE,
     '#description' => 'URL to your Etherpad Lite installation. Without trailing slash. e.g. http://localhost:9001',
   );
@@ -48,15 +60,15 @@ function etherpad_lite_admin_settings() {
   $form['etherpad_lite_cookie_domain'] = array(
     '#type' => 'textfield',
     '#title' => 'Cookie domain',
-    '#default_value' => variable_get('etherpad_lite_cookie_domain', 'localhost'),
+    '#default_value' => $config->get('etherpad_lite_cookie_domain'),
     '#required' => TRUE,
-    '#description' => 'Cookie Domain for your Etherpad. Must be writable for Drupal. <strong>Without protocoll.</strong> e.g. localhost',
+    '#description' => 'Cookie Domain for your Etherpad. Must be writable for Backdrop. <strong>Without protocoll.</strong> e.g. localhost',
   );
 
   $form['etherpad_lite_session_timeout'] = array(
     '#type' => 'textfield',
     '#title' => 'Session timeout',
-    '#default_value' => variable_get('etherpad_lite_session_timeout', 60 * 60),
+    '#default_value' => $config->get('etherpad_lite_session_timeout'),
     '#required' => TRUE,
     '#description' => 'Session timeout in seconds. Used in the cookie.',
   );
@@ -64,7 +76,7 @@ function etherpad_lite_admin_settings() {
   $form = system_settings_form($form);
 
   // Clear all caches to rebuild wsclient definitions.
-  $form['#submit'][] = 'drupal_flush_all_caches';
+  $form['#submit'][] = 'backdrop_flush_all_caches';
   return $form;
 }
 
@@ -301,15 +313,16 @@ function etherpad_lite_field_formatter_view($entity_type, $entity, $field, $inst
  *   Renderable etherpad element.
  */
 function etherpad_lite_prepare_iframe($pid, $options = array(), $access = array()) {
+  $config = config('etherpad_lite.settings');
   global $user;
   $options += array(
-    'url' => variable_get('etherpad_lite_url', 'http://localhost:9001'),
+    'url' => $config->get('etherpad_lite_url'),
   );
 
   $denied = FALSE;
   $group = explode('$', $pid);
   // The pad is a group pad. Grant access to user.
-  if (drupal_substr($group[0], 0, 1) == 'g') {
+  if (backdrop_substr($group[0], 0, 1) == 'g') {
     $denied = TRUE;
     $gid = $group[0];
     $access += array(
@@ -321,17 +334,17 @@ function etherpad_lite_prepare_iframe($pid, $options = array(), $access = array(
 
     if (entity_access($access['enity_op'], $access['entity_type'], $access['entity'], $access['account']) && field_access($access['op'], $access['field'], $access['entity_type'], $access['entity'], $access['account'])) {
       // Update user.
-      $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($user), $user->uid);
+      $result = etherpad_lite_client()->createAuthorIfNotExistsFor(user_format_name($user), $user->uid);
       if (!empty($result['data']['authorID'])) {
         $aid = $result['data']['authorID'];
       }
 
       // Grant current user.
       if (isset($gid) && isset($aid)) {
-        $timeout = time() + variable_get('etherpad_lite_session_timeout', 60 * 60);
+        $timeout = time() + $config->get('etherpad_lite_session_timeout');
         $access = etherpad_lite_client()->createSession($timeout, $aid, $gid);
         if (!empty($access['data']['sessionID'])) {
-          setcookie('sessionID', $access['data']['sessionID'], $timeout, '/', variable_get('etherpad_lite_cookie_domain'));
+          setcookie('sessionID', $access['data']['sessionID'], $timeout, '/', $config->get('etherpad_lite_cookie_domain'));
           $denied = FALSE;
         }
       }
@@ -405,7 +418,7 @@ function theme_etherpad(&$variables) {
   // This wrapper is required to apply CSS styling.
   $output = '';
   $output .= '<div class="etherpad-iframe">';
-  $output .= drupal_render_children($element);
+  $output .= backdrop_render_children($element);
   $output .= '</div>';
   return $output;
 }
@@ -417,7 +430,7 @@ function theme_etherpad_iframe(&$variables) {
   $element = $variables['element'];
   $element['#theme'] = 'html_tag';
   $element['#tag'] = 'iframe';
-  return drupal_render($element);
+  return backdrop_render($element);
 }
 
 /**
@@ -441,7 +454,7 @@ function etherpad_lite_client($reset = FALSE) {
  * Implements hook_user_logout().
  */
 function etherpad_lite_user_logout($account) {
-  $result = etherpad_lite_client()->createAuthorIfNotExistsFor(format_username($account->name), $account->uid);
+  $result = etherpad_lite_client()->createAuthorIfNotExistsFor(user_format_name($account->name), $account->uid);
   if (!empty($result['data']['authorID'])) {
     $aid = $result['data']['authorID'];
     $sessions = etherpad_lite_client()->listSessionsOfAuthor($aid);

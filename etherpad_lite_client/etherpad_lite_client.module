@@ -11,6 +11,7 @@
  */
 function etherpad_lite_client_default_wsclient_service() {
   $default_parameter = array();
+  // TODO This variable was probably removed in Backdrop without replacement.
   $default_parameter['apikey'] = array(
     'type' => 'hidden',
     'default value' => variable_get('etherpad_lite_apikey'),
@@ -19,6 +20,7 @@ function etherpad_lite_client_default_wsclient_service() {
   $service = new WSClientServiceDescription();
   $service->name = 'etherpad_lite';
   $service->label = 'Etherad lite';
+  // TODO This variable was probably removed in Backdrop without replacement.
   $service->url = variable_get('etherpad_lite_url', 'http://localhost:9001') . '/api/1/';
   $service->type = 'rest';
 
@@ -26,7 +28,10 @@ function etherpad_lite_client_default_wsclient_service() {
   $operation['label'] = 'createGroup';
   $operation['url'] = 'createGroup';
   $operation['parameter'] = $default_parameter;
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createGroup'] = $operation;
 
   $operation = array();
@@ -38,7 +43,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['deleteGroup'] = $operation;
 
   $operation = array();
@@ -50,7 +58,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createGroupIfNotExistsFor'] = $operation;
 
   $operation = array();
@@ -62,7 +73,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['listPads'] = $operation;
 
   $operation = array();
@@ -77,7 +91,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createPad'] = $operation;
 
   $operation = array();
@@ -95,7 +112,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createGroupPad'] = $operation;
 
   $operation = array();
@@ -107,7 +127,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createAuthor'] = $operation;
 
   $operation = array();
@@ -122,7 +145,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createAuthorIfNotExistsFor'] = $operation;
 
   $operation = array();
@@ -140,7 +166,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['createSession'] = $operation;
 
   $operation = array();
@@ -152,7 +181,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['deleteSession'] = $operation;
 
   $operation = array();
@@ -164,7 +196,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['getSessionInfo'] = $operation;
 
   $operation = array();
@@ -176,7 +211,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['listSessionsOfGroup'] = $operation;
 
   $operation = array();
@@ -188,7 +226,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['listSessionsOfAuthor'] = $operation;
 
   $operation = array();
@@ -203,7 +244,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['getText'] = $operation;
 
   $operation = array();
@@ -218,7 +262,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['setText'] = $operation;
 
   $operation = array();
@@ -230,7 +277,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['getRevisionsCount'] = $operation;
 
   $operation = array();
@@ -242,7 +292,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['deletePad'] = $operation;
 
   $operation = array();
@@ -254,7 +307,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['getReadOnlyID'] = $operation;
 
   $operation = array();
@@ -269,7 +325,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['setPublicStatus'] = $operation;
 
   $operation = array();
@@ -281,7 +340,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['getPublicStatus'] = $operation;
 
   $operation = array();
@@ -296,7 +358,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['setPassword'] = $operation;
 
   $operation = array();
@@ -308,7 +373,10 @@ function etherpad_lite_client_default_wsclient_service() {
       'type' => 'text',
     ),
   );
-  $operation['result'] = array('type' => 'text', 'label' => 'Result');
+  $operation['result'] = array(
+    'type' => 'text',
+    'label' => 'Result',
+  );
   $service->operations['isPasswordProtected'] = $operation;
 
   $services[$service->name] = $service;
